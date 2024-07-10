@@ -460,19 +460,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Volgai\\.nuget\\packages\\": {}
+    "/Users/laxmansharma/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Volgai\\Desktop\\dotnet-course-code\\DotnetAPI\\DotnetAPI.csproj",
+      "projectUniqueName": "/Users/laxmansharma/Desktop/Dotnet-Course/DotnetAPI.csproj",
       "projectName": "DotnetAPI",
-      "projectPath": "C:\\Users\\Volgai\\Desktop\\dotnet-course-code\\DotnetAPI\\DotnetAPI.csproj",
-      "packagesPath": "C:\\Users\\Volgai\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Volgai\\Desktop\\dotnet-course-code\\DotnetAPI\\obj\\",
+      "projectPath": "/Users/laxmansharma/Desktop/Dotnet-Course/DotnetAPI.csproj",
+      "packagesPath": "/Users/laxmansharma/.nuget/packages/",
+      "outputPath": "/Users/laxmansharma/Desktop/Dotnet-Course/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Volgai\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/laxmansharma/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -529,7 +529,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
