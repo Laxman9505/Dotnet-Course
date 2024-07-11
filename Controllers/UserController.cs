@@ -1,4 +1,5 @@
 using DOTNETAPI.Data;
+using DOTNETAPI.DTOs;
 using DOTNETAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -70,7 +71,7 @@ namespace DOTNETAPI.Controllers
         }
 
         [HttpPost("/addUser")]
-        public IActionResult AddUser([FromBody] User user)
+        public IActionResult AddUser([FromBody] UserToAddDto user)
         {
             string sql = @"
                 INSERT INTO TutorialAppSchema.Users
@@ -78,6 +79,8 @@ namespace DOTNETAPI.Controllers
                 VALUES
                 (@FirstName, @LastName, @Email, @Gender, @Active)
             ";
+
+            Console.WriteLine(sql);
 
             var parameters = new
             {
@@ -93,8 +96,21 @@ namespace DOTNETAPI.Controllers
                 return Ok();
             }
             Console.WriteLine(user.FirstName);
-            throw new Exception("Something went wrong");
+            throw new Exception("Failed to add user");
         }
+
+        [HttpDelete("deleteUser/{userid}")]
+        public IActionResult DeleteUser(int userid)
+        {
+            string sql = $@"DELETE FROM TutorialAppSchema.Users WHERE UserId = @UserId";
+            var parameters = new { UserId = userid };
+            if (_dapper.ExecuteSql(sql, parameters))
+            {
+                return Ok();
+            }
+            throw new Exception("Failed to delete user");
+        }
+
 
 
 
