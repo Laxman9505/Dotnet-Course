@@ -1,5 +1,5 @@
+using DotnetAPI.Dtos;
 using DOTNETAPI.Data;
-using DOTNETAPI.DTOs;
 using DOTNETAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 

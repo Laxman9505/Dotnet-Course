@@ -12,17 +12,17 @@ namespace DOTNETAPI.Data
         {
             _config = config;
         }
-        public IEnumerable<T> LoadData<T>(string sql)
+        public IEnumerable<T> LoadData<T>(string sql, object? parameters = null)
         {
             IDbConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            return dbConnection.Query<T>(sql);
+            return dbConnection.Query<T>(sql, parameters);
         }
 
-        public T LoadDataSingle<T>(string sql)
+        public T LoadDataSingle<T>(string sql, object? parameters = null)
         {
             Console.WriteLine(_config.GetConnectionString("DefaultConnection"));
             IDbConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            return dbConnection.QuerySingle<T>(sql);
+            return dbConnection.QuerySingle<T>(sql, parameters);
         }
 
         public bool ExecuteSql(string sql, object? parameters = null)
@@ -31,10 +31,10 @@ namespace DOTNETAPI.Data
             return dbConnection.Execute(sql, parameters) > 0;
         }
 
-        public int ExecuteSqlWithRowCount(string sql)
+        public int ExecuteSqlWithRowCount(string sql, object? parameters = null)
         {
             IDbConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            return dbConnection.Execute(sql);
+            return dbConnection.Execute(sql, parameters);
         }
 
     }
