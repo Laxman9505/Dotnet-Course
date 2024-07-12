@@ -221,3 +221,4 @@ C:\Users\Volgai\Desktop\dotnet-course-code\DotnetAPI\bin\Debug\net8.0\Microsoft.
 C:\Users\Volgai\Desktop\dotnet-course-code\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\Volgai\Desktop\dotnet-course-code\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.dll
 >>>>>>> 1bd81affc49fc27746c056a1cb5ee2b9ee9c937c
+C:\Users\Volgai\Desktop\dotnet-course-code\DotnetAPI\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
