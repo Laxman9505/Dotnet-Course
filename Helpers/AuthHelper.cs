@@ -16,7 +16,6 @@ namespace DOTNETAPI.Helpers
             _config = config;
         }
 
-
         public byte[] GetPasswordHash(string password, byte[] passwordSalt)
         {
             string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value + Convert.ToBase64String(passwordSalt);
@@ -26,9 +25,9 @@ namespace DOTNETAPI.Helpers
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 1000000,
                 numBytesRequested: 256 / 8
-                );
+                );    
         }
-
+        
         public string CreateToken(int userId)
         {
             Claim[] claims = new Claim[] {
