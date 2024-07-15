@@ -111,8 +111,5 @@ namespace DOTNETAPI.Controllers
             throw new Exception("Failed to delete user");
         }
 
-
-
-
     }
 }

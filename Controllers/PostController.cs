@@ -1,4 +1,6 @@
 
+using System.Text;
+using Dapper;
 using DOTNETAPI.Data;
 using DOTNETAPI.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,123 +22,116 @@ namespace DOTNETAPI.Controllers
             _dapper = new DataContextDapper(config);
         }
 
-        [HttpGet("Posts")]
-        public IEnumerable<Post> GetPosts()
+        [HttpGet("Posts/{postId}/{userId}/{searchParam}")]
+        public IEnumerable<Post> GetPosts(int postId, int userId, string searchParam = "None")
         {
-            string sql = @"
-                    SELECT * FROM TutorialAppSchema.Posts
-            ";
-            return _dapper.LoadData<Post>(sql);
-        }
+            var sql = new StringBuilder("EXEC TutorialAppSchema.sp_Posts_Get");
+            var parameters = new DynamicParameters();
 
-        [HttpGet("Posts/{postId}")]
-        public Post GetPost(int postId)
-        {
-            string sql = @"
-                SELECT * FROM TutorailAppSchema.Posts
-                    WHERE PostId=@PostId
-            ";
-            var parameters = new
-            {
-                PostId = postId
-            };
-            return _dapper.LoadDataSingle<Post>(sql, parameters);
-        }
+            bool firstCondition = true;
 
-        [HttpGet("PostsByUser/{userId}")]
-        public IEnumerable<Post> GetPostsByUser(int userId)
-        {
-            string sql = @"
-                SELECT * FROM TutorialAppSchema.Posts
-                    WHERE UserId= @UserId
-            ";
-            var parameters = new
+            if (postId != 0)
             {
-                UserId = userId
-            };
-            return _dapper.LoadData<Post>(sql, parameters);
+                if (!firstCondition) sql.Append(",");
+                sql.Append(" @PostId = @PostId");
+                parameters.Add("PostId", postId);
+                firstCondition = false;
+            }
+
+            if (userId != 0)
+            {
+                if (!firstCondition) sql.Append(",");
+                sql.Append(" @UserId = @UserId");
+                parameters.Add("UserId", userId);
+                firstCondition = false;
+            }
+
+            if (searchParam != "None")
+            {
+                if (!firstCondition) sql.Append(",");
+                sql.Append(" @SearchValue = @SearchValue");
+                parameters.Add("SearchValue", searchParam);
+            }
+
+            return _dapper.LoadData<Post>(sql.ToString(), parameters);
         }
 
         [HttpGet("MyPosts")]
         public IEnumerable<Post> GetMyPosts()
         {
-            string sql = @"
-                    SELECT * FROM TutorialAppSchema.Posts
-                        WHERE UserId= @UserId
-            ";
+            string sql = @"EXEC TutorialAppSchema.sp_Posts_Upsert @UserId=@UserId";
             var parameters = new
             {
                 UserId = User.FindFirst("userId")?.Value
             };
             return _dapper.LoadData<Post>(sql, parameters);
         }
-        [HttpPost("Post")]
-        public IActionResult AddPost(PostToAddDto postToAdd)
+        [HttpPut("UpsertPost")]
+        public IActionResult UpsertPost(Post post)
         {
-            string sql = @"
-                INSERT INTO TutorialAppSchema.Posts (
-                    UserId,
-                    PostTitle,
-                    PostContent,
-                    PostCreated,
-                    PostUpdated
-                ) VALUES (
-                    @UserId,
-                    @PostTitle,
-                    @PostContent,
-                    @PostCreated,
-                    @PostUpdated
-                )
-            ";
-            var parameters = new
-            {
-                UserId = User.FindFirst("userId"),
-                PostTitle = postToAdd.PostTitle,
-                PostContent = postToAdd.PostContent,
-                PostCreated = DateTime.Now,
-                PostUpdated = DateTime.Now
+            StringBuilder sql = new StringBuilder(@"EXEC TutorialAppSchema.sp_Posts_Upsert ");
+            var parameters = new DynamicParameters();
+            bool isFirstParameterInserted = false;
 
-            };
-            if (_dapper.ExecuteSql(sql, parameters))
+            if ((User.FindFirst("userId")?.Value ?? "").Length > 0)
+            {
+                if (isFirstParameterInserted)
+                {
+                    sql.Append(",");
+
+                }
+                sql.Append("@UserId=@UserId");
+                parameters.Add("UserId", User.FindFirst("userId")?.Value);
+                isFirstParameterInserted = true;
+            }
+            if (post.PostId > 0)
+            {
+                if (isFirstParameterInserted)
+                {
+                    sql.Append(",");
+                }
+                sql.Append("@PostId=@PostId");
+                parameters.Add("PostId", post.PostId);
+                isFirstParameterInserted = true;
+
+            }
+            if (post.PostTitle.Length > 0)
+            {
+                if (isFirstParameterInserted)
+                {
+                    sql.Append(",");
+                    isFirstParameterInserted = true;
+                }
+                sql.Append("@PostTitle=@PostTitle");
+                parameters.Add("PostTitle", post.PostTitle);
+                isFirstParameterInserted = true;
+
+            }
+            if (post.PostContent.Length > 0)
+            {
+                if (isFirstParameterInserted)
+                {
+                    sql.Append(",");
+                }
+                sql.Append("@PostContent=@PostContent");
+                parameters.Add("PostContent", post.PostContent);
+                isFirstParameterInserted = true;
+
+            }
+            Console.WriteLine(sql.ToString());
+            if (_dapper.ExecuteSql(sql.ToString(), parameters))
             {
                 return Ok();
             }
-            throw new Exception("Failed to create new post");
+            throw new Exception("Failed to upser post");
 
-        }
-        [HttpPut("Post")]
-        public IActionResult EditPost(PostToEditDto postToEdit)
-        {
-            string sql = @"
-                UPDATE TutorialAppSchema.Posts SET
-                    PostTitle= @PostTitle
-                    PostContent= @PostContent
-                    PostUpdated= @PostUpdated
-                WHERE
-                    PostId= @PostId AND UserId=@UserId    
-            ";
-            var parameters = new
-            {
-                PostTitle = postToEdit.PostTitle,
-                PostContent = postToEdit.PostContent,
-                PostUpdated = DateTime.Now,
-                PostId = postToEdit.PostId,
-                UserId = User.FindFirst("userId")?.Value
-            };
-            if (_dapper.ExecuteSql(sql, parameters))
-            {
-                return Ok();
-            }
-            throw new Exception("Failed to Updated the post");
         }
 
         [HttpDelete("Post/{postId}")]
 
         public IActionResult DeletePost(int postId)
         {
-            string sql = @"
-                DELETE FROM TutorialAppSchema.Posts 
-                    WHERE PostId=@PostId AND UserId= @UserId
+            string sql = @"EXEC TutorialAppSchema.sp_Posts_Delete @PostId=@PostId, @UserId= @UserId
             ";
             var parameters = new
             {
@@ -149,25 +144,6 @@ namespace DOTNETAPI.Controllers
                 return Ok();
             }
             throw new Exception("Failed to Delete the post");
-        }
-
-        [HttpGet("SearchPosts/{searchKeyword}")]
-
-        public IEnumerable<Post> SearchPosts(string searchKeyword)
-        {
-            string sql = @"
-                    SELECT * 
-                    FROM TutorialAppSchema.Posts
-                    WHERE PostTitle LIKE '%' + @searchKeyword + '%' 
-                    OR PostContent LIKE '%' + @searchKeyword + '%';
-                    ";
-            var parameters = new
-            {
-                searchKeyword = searchKeyword
-            };
-
-            return _dapper.LoadData<Post>(sql, parameters);
-
         }
 
 
